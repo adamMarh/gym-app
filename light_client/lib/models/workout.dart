@@ -15,6 +15,18 @@ class Exercise {
 
   double get volume => sets * reps * weightKg;
 
+  factory Exercise.fromJson(Map<String, dynamic> json) {
+    return Exercise(
+      name: json['name'] as String,
+      sets: (json['sets'] as num).toInt(),
+      reps: (json['reps'] as num).toInt(),
+      weightKg: (json['weightKg'] as num).toDouble(),
+      notes: (json['notes'] as String?)?.isEmpty == true
+          ? null
+          : json['notes'] as String?,
+    );
+  }
+
   Exercise copyWith({
     String? name,
     int? sets,
@@ -56,42 +68,20 @@ class WorkoutSession {
 
   int get totalSets => exercises.fold(0, (sum, e) => sum + e.sets);
 
-  static List<WorkoutSession> mockSessions = [
-    WorkoutSession(
-      id: 'w1',
-      userId: 'u1',
-      title: 'PUSH DAY',
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      duration: const Duration(hours: 1, minutes: 15),
-      exercises: [
-        const Exercise(name: 'Bench Press', sets: 4, reps: 8, weightKg: 100),
-        const Exercise(name: 'Shoulder Press', sets: 3, reps: 10, weightKg: 60),
-        const Exercise(name: 'Tricep Dips', sets: 3, reps: 12, weightKg: 0),
-      ],
-    ),
-    WorkoutSession(
-      id: 'w2',
-      userId: 'u1',
-      title: 'LEG DAY',
-      date: DateTime.now().subtract(const Duration(days: 3)),
-      duration: const Duration(hours: 1, minutes: 30),
-      exercises: [
-        const Exercise(name: 'Squat', sets: 5, reps: 5, weightKg: 150),
-        const Exercise(name: 'Romanian DL', sets: 3, reps: 8, weightKg: 110),
-        const Exercise(name: 'Leg Press', sets: 3, reps: 12, weightKg: 200),
-      ],
-    ),
-    WorkoutSession(
-      id: 'w3',
-      userId: 'u1',
-      title: 'PULL DAY',
-      date: DateTime.now().subtract(const Duration(days: 5)),
-      duration: const Duration(hours: 1, minutes: 10),
-      exercises: [
-        const Exercise(name: 'Deadlift', sets: 4, reps: 5, weightKg: 160),
-        const Exercise(name: 'Pull-ups', sets: 3, reps: 8, weightKg: 0),
-        const Exercise(name: 'Barbell Row', sets: 3, reps: 10, weightKg: 80),
-      ],
-    ),
-  ];
+  factory WorkoutSession.fromJson(Map<String, dynamic> json) {
+    final rawExercises = json['exercises'] as List<dynamic>? ?? [];
+    return WorkoutSession(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      date: DateTime.parse(json['date'] as String),
+      duration: Duration(minutes: (json['durationMinutes'] as num).toInt()),
+      notes: (json['notes'] as String?)?.isEmpty == true
+          ? null
+          : json['notes'] as String?,
+      exercises: rawExercises
+          .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }

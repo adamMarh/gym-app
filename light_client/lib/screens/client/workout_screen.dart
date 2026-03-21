@@ -292,7 +292,7 @@ class _AddWorkoutSheetState extends State<_AddWorkoutSheet> {
     super.dispose();
   }
 
-  void _save(BuildContext ctx) {
+  Future<void> _save(BuildContext ctx) async {
     final user = ctx.read<AuthProvider>().currentUser!;
     final exercises = _exercises
         .where((row) => row['name']!.text.trim().isNotEmpty)
@@ -307,7 +307,7 @@ class _AddWorkoutSheetState extends State<_AddWorkoutSheet> {
     if (_titleCtrl.text.trim().isEmpty || exercises.isEmpty) return;
 
     final session = WorkoutSession(
-      id: 'w${DateTime.now().millisecondsSinceEpoch}',
+      id: '',  // assigned by server
       userId: user.id,
       title: _titleCtrl.text.trim().toUpperCase(),
       date: DateTime.now(),
@@ -315,8 +315,8 @@ class _AddWorkoutSheetState extends State<_AddWorkoutSheet> {
       duration: const Duration(hours: 1),
     );
 
-    ctx.read<WorkoutProvider>().addSession(session);
-    Navigator.pop(ctx);
+    await ctx.read<WorkoutProvider>().addSession(session);
+    if (ctx.mounted) Navigator.pop(ctx);
   }
 
   @override
@@ -356,7 +356,7 @@ class _AddWorkoutSheetState extends State<_AddWorkoutSheet> {
           const SizedBox(height: 20),
           KineticButton(
             label: 'SAVE WORKOUT',
-            onPressed: () => _save(context),
+            onPressed: () async => _save(context),
             fullWidth: true,
           ),
           const SizedBox(height: 24),

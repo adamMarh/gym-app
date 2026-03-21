@@ -19,6 +19,21 @@ class StaffReport {
     this.adminNotes,
   });
 
+  factory StaffReport.fromJson(Map<String, dynamic> json) {
+    return StaffReport(
+      id: json['id'] as String,
+      staffId: json['staffId'] as String,
+      staffName: json['staffName'] as String,
+      date: DateTime.parse(json['date'] as String),
+      summary: json['summary'] as String,
+      details: json['details'] as String,
+      isReviewed: json['isReviewed'] as bool? ?? false,
+      adminNotes: (json['adminNotes'] as String?)?.isEmpty == true
+          ? null
+          : json['adminNotes'] as String?,
+    );
+  }
+
   StaffReport copyWith({bool? isReviewed, String? adminNotes}) {
     return StaffReport(
       id: id,
@@ -31,41 +46,16 @@ class StaffReport {
       adminNotes: adminNotes ?? this.adminNotes,
     );
   }
-
-  static List<StaffReport> mockReports = [
-    StaffReport(
-      id: 'r1',
-      staffId: 'u2',
-      staffName: 'Jordan Smith',
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      summary: 'Completed morning HIIT and afternoon yoga sessions.',
-      details:
-          'HIIT class had 14 participants — all completed the full session. '
-          'Equipment check performed. Minor repair needed on treadmill #3. '
-          'Yoga class had 12 participants. Overall smooth day.',
-      isReviewed: true,
-      adminNotes: 'Good work. Please follow up on treadmill repair.',
-    ),
-    StaffReport(
-      id: 'r2',
-      staffId: 'u2',
-      staffName: 'Jordan Smith',
-      date: DateTime.now(),
-      summary: 'Managed front desk and led boxing intro class.',
-      details:
-          'Front desk was busy this morning with 8 new member sign-ups. '
-          'Boxing intro class had 10 participants, all beginners. '
-          'Reported a faulty locker to maintenance.',
-    ),
-  ];
 }
 
 class PunchRecord {
+  final String id;
   final String staffId;
   final DateTime punchIn;
   DateTime? punchOut;
 
   PunchRecord({
+    required this.id,
     required this.staffId,
     required this.punchIn,
     this.punchOut,
@@ -77,4 +67,14 @@ class PunchRecord {
   }
 
   bool get isActive => punchOut == null;
+
+  factory PunchRecord.fromJson(Map<String, dynamic> json) {
+    final punchOutStr = json['punchOut'] as String? ?? '';
+    return PunchRecord(
+      id: json['id'] as String,
+      staffId: json['staffId'] as String,
+      punchIn: DateTime.parse(json['punchIn'] as String),
+      punchOut: punchOutStr.isEmpty ? null : DateTime.parse(punchOutStr),
+    );
+  }
 }

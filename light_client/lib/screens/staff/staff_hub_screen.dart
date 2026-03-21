@@ -40,7 +40,6 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Punch Clock Section
           Text('PUNCH CLOCK', style: AppTextStyles.labelSmCaps),
           const SizedBox(height: 12),
           _PunchClockCard(
@@ -52,7 +51,6 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
 
           const SizedBox(height: 28),
 
-          // Stats
           if (isPunchedIn && punch != null) ...[
             Text('ACTIVE SESSION', style: AppTextStyles.labelSmCaps),
             const SizedBox(height: 12),
@@ -75,7 +73,6 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
             const SizedBox(height: 28),
           ],
 
-          // Report Submission
           Text('DAILY REPORT', style: AppTextStyles.labelSmCaps),
           const SizedBox(height: 12),
           Container(
@@ -85,7 +82,9 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('EEEE, MMMM d').format(DateTime.now()).toUpperCase(),
+                  DateFormat('EEEE, MMMM d')
+                      .format(DateTime.now())
+                      .toUpperCase(),
                   style: AppTextStyles.labelSmCaps
                       .copyWith(color: AppColors.primary),
                 ),
@@ -114,7 +113,7 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
                 KineticButton(
                   label: 'SUBMIT REPORT',
                   fullWidth: true,
-                  onPressed: () => _submitReport(context, user.id, user.name),
+                  onPressed: () => _submitReport(context),
                 ),
               ],
             ),
@@ -122,7 +121,6 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
 
           const SizedBox(height: 28),
 
-          // My Recent Reports
           Text('MY RECENT REPORTS', style: AppTextStyles.labelSmCaps),
           const SizedBox(height: 12),
           ...staffProvider.reports
@@ -134,7 +132,7 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
     );
   }
 
-  void _submitReport(BuildContext context, String staffId, String staffName) {
+  Future<void> _submitReport(BuildContext context) async {
     if (_summaryCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please add a summary')),
@@ -142,11 +140,13 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
       return;
     }
 
-    context.read<StaffProvider>().submitReport(
+    final user = context.read<AuthProvider>().currentUser!;
+
+    await context.read<StaffProvider>().submitReport(
           StaffReport(
-            id: 'r${DateTime.now().millisecondsSinceEpoch}',
-            staffId: staffId,
-            staffName: staffName,
+            id: '',
+            staffId: user.id,
+            staffName: user.name,
             date: DateTime.now(),
             summary: _summaryCtrl.text.trim(),
             details: _detailCtrl.text.trim(),
@@ -156,15 +156,18 @@ class _StaffHubScreenState extends State<StaffHubScreen> {
     _summaryCtrl.clear();
     _detailCtrl.clear();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'REPORT SUBMITTED',
-          style: AppTextStyles.labelMd.copyWith(color: AppColors.onPrimary),
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'REPORT SUBMITTED',
+            style:
+                AppTextStyles.labelMd.copyWith(color: AppColors.onPrimary),
+          ),
+          backgroundColor: AppColors.primary,
         ),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+      );
+    }
   }
 }
 
@@ -188,7 +191,6 @@ class _PunchClockCard extends StatelessWidget {
       color: AppColors.surfaceContainerHigh,
       child: Column(
         children: [
-          // Current time display
           Text(
             DateFormat('h:mm').format(DateTime.now()),
             style: AppTextStyles.displayLg.copyWith(
@@ -200,8 +202,6 @@ class _PunchClockCard extends StatelessWidget {
             style: AppTextStyles.labelSmCaps,
           ),
           const SizedBox(height: 24),
-
-          // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             color: isPunchedIn
@@ -210,12 +210,13 @@ class _PunchClockCard extends StatelessWidget {
             child: Text(
               isPunchedIn ? '● ON DUTY' : '○ OFF DUTY',
               style: AppTextStyles.labelSmCaps.copyWith(
-                color: isPunchedIn ? AppColors.success : AppColors.onSurfaceVariant,
+                color: isPunchedIn
+                    ? AppColors.success
+                    : AppColors.onSurfaceVariant,
               ),
             ),
           ),
           const SizedBox(height: 24),
-
           KineticButton(
             label: isPunchedIn ? 'PUNCH OUT' : 'PUNCH IN',
             onPressed: isPunchedIn ? onPunchOut : onPunchIn,
@@ -268,11 +269,13 @@ class _ReportRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(report.summary,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.labelLg
-                        .copyWith(color: AppColors.onBackground)),
+                Text(
+                  report.summary,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.labelLg
+                      .copyWith(color: AppColors.onBackground),
+                ),
                 const SizedBox(height: 2),
                 Text(
                   DateFormat('EEE, MMM d').format(report.date).toUpperCase(),
@@ -283,8 +286,7 @@ class _ReportRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(100),
               color: report.isReviewed

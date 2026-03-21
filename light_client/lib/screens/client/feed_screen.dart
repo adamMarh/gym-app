@@ -73,7 +73,7 @@ class FeedScreen extends StatelessWidget {
         post: post,
         onSubmit: (text) {
           final comment = Comment(
-            id: 'cm${DateTime.now().millisecondsSinceEpoch}',
+            id: '',
             userId: user.id,
             userName: user.name,
             content: text,
@@ -156,8 +156,9 @@ class _NewPostSheetState extends State<_NewPostSheet> {
             fullWidth: true,
             onPressed: () {
               if (_ctrl.text.trim().isEmpty) return;
+              // The server fills in id, userId, userName and createdAt
               context.read<FeedProvider>().addPost(Post(
-                    id: 'p${DateTime.now().millisecondsSinceEpoch}',
+                    id: '',
                     userId: widget.userId,
                     userName: widget.userName,
                     content: _ctrl.text.trim(),

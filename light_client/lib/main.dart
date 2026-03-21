@@ -5,6 +5,7 @@ import 'providers/auth_provider.dart';
 import 'providers/class_provider.dart';
 import 'providers/feed_provider.dart';
 import 'providers/staff_provider.dart';
+import 'providers/user_provider.dart';
 import 'providers/workout_provider.dart';
 import 'theme/app_theme.dart';
 import 'navigation/main_navigation.dart';
@@ -26,14 +27,48 @@ class CseeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ClassProvider()),
         ChangeNotifierProvider(create: (_) => FeedProvider()),
         ChangeNotifierProvider(create: (_) => StaffProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'CSEE GYM',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
-        home: const _AuthGate(),
+        home: const _AppStartup(),
       ),
     );
+  }
+}
+
+/// Restores the JWT session before showing any screen.
+class _AppStartup extends StatefulWidget {
+  const _AppStartup();
+
+  @override
+  State<_AppStartup> createState() => _AppStartupState();
+}
+
+class _AppStartupState extends State<_AppStartup> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _restore();
+  }
+
+  Future<void> _restore() async {
+    await context.read<AuthProvider>().tryRestoreSession();
+    setState(() => _ready = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return const _AuthGate();
   }
 }
 

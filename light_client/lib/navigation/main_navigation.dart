@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 import '../providers/auth_provider.dart';
+import '../providers/class_provider.dart';
+import '../providers/feed_provider.dart';
+import '../providers/staff_provider.dart';
+import '../providers/user_provider.dart';
+import '../providers/workout_provider.dart';
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
 
@@ -28,10 +33,39 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay until first frame so context.read() is safe
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initProviders());
+  }
+
+  Future<void> _initProviders() async {
+    final user = context.read<AuthProvider>().currentUser;
+    if (user == null) return;
+
+    await Future.wait([
+      context.read<ClassProvider>().init(),
+      context.read<WorkoutProvider>().init(),
+      context.read<FeedProvider>().init(),
+      if (user.isStaff) context.read<StaffProvider>().init(),
+      if (user.isAdmin) context.read<UserProvider>().init(),
+    ]);
+
+    if (mounted) setState(() => _initialized = true);
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser!;
+
+    if (!_initialized) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     final tabs = _buildTabs(user);
     final screens = tabs.map((t) => t.screen).toList();

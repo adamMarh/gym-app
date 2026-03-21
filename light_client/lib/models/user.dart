@@ -24,6 +24,34 @@ class User {
   bool get isAdmin => role == UserRole.admin;
   bool get isStaff => role == UserRole.staff || role == UserRole.admin;
 
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      avatarUrl: (json['avatarUrl'] as String?)?.isEmpty == true
+          ? null
+          : json['avatarUrl'] as String?,
+      role: _parseRole(json['role'] as String),
+      membershipTier: json['membershipTier'] as String? ?? 'Standard',
+      membershipExpiry: DateTime.parse(json['membershipExpiry'] as String),
+      phone: (json['phone'] as String?)?.isEmpty == true
+          ? null
+          : json['phone'] as String?,
+    );
+  }
+
+  static UserRole _parseRole(String role) {
+    switch (role) {
+      case 'admin':
+        return UserRole.admin;
+      case 'staff':
+        return UserRole.staff;
+      default:
+        return UserRole.client;
+    }
+  }
+
   User copyWith({
     String? name,
     String? email,
@@ -43,31 +71,4 @@ class User {
       phone: phone ?? this.phone,
     );
   }
-
-  static List<User> mockUsers = [
-    User(
-      id: 'u1',
-      name: 'Alex Rivera',
-      email: 'alex@example.com',
-      role: UserRole.client,
-      membershipTier: 'Elite',
-      membershipExpiry: DateTime.now().add(const Duration(days: 90)),
-    ),
-    User(
-      id: 'u2',
-      name: 'Jordan Smith',
-      email: 'jordan@example.com',
-      role: UserRole.staff,
-      membershipTier: 'Staff',
-      membershipExpiry: DateTime.now().add(const Duration(days: 365)),
-    ),
-    User(
-      id: 'u3',
-      name: 'Sam Chen',
-      email: 'sam@example.com',
-      role: UserRole.admin,
-      membershipTier: 'Admin',
-      membershipExpiry: DateTime.now().add(const Duration(days: 365)),
-    ),
-  ];
 }

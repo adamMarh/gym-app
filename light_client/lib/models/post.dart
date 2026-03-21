@@ -27,55 +27,29 @@ class Post {
     List<Comment>? comments,
   }) : comments = comments ?? [];
 
-  static List<Post> mockPosts = [
-    Post(
-      id: 'p1',
-      userId: 'u1',
-      userName: 'Alex Rivera',
-      content:
-          'NEW PR TODAY 🔥 Hit 150KG on the squat. Consistent training pays off. #CSEE #PRAlert',
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-      likes: 42,
-      isLiked: true,
-      comments: [
-        Comment(
-          id: 'cm1',
-          userId: 'u2',
-          userName: 'Jordan Smith',
-          content: 'BEAST MODE 🏆',
-          createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-        ),
-      ],
-    ),
-    Post(
-      id: 'p2',
-      userId: 'u2',
-      userName: 'Jordan Smith',
-      content:
-          'Morning HIIT class was absolutely brutal today. If you weren\'t sweating, you weren\'t trying. See you tomorrow at 6AM 💪',
-      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-      likes: 28,
-    ),
-    Post(
-      id: 'p3',
-      userId: 'u3',
-      userName: 'Sam Chen',
-      content:
-          '📢 New boxing classes starting next Monday. Limited spots available — book now in the Classes tab!',
-      createdAt: DateTime.now().subtract(const Duration(hours: 12)),
-      likes: 67,
-      isPinned: true,
-    ),
-    Post(
-      id: 'p4',
-      userId: 'u1',
-      userName: 'Alex Rivera',
-      content:
-          'Week 8 of my strength program done. Volume is up 40% from where I started. The grind is real. 📈',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      likes: 19,
-    ),
-  ];
+  factory Post.fromJson(Map<String, dynamic> json) {
+    final rawComments = json['comments'] as List<dynamic>? ?? [];
+    return Post(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      userName: json['userName'] as String,
+      userAvatarUrl: (json['userAvatarUrl'] as String?)?.isEmpty == true
+          ? null
+          : json['userAvatarUrl'] as String?,
+      content: json['content'] as String,
+      imageUrl: (json['imageUrl'] as String?)?.isEmpty == true
+          ? null
+          : json['imageUrl'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      likes: (json['likes'] as num?)?.toInt() ?? 0,
+      isLiked: json['isLiked'] as bool? ?? false,
+      isPinned: json['isPinned'] as bool? ?? false,
+      isFlagged: json['isFlagged'] as bool? ?? false,
+      comments: rawComments
+          .map((c) => Comment.fromJson(c as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 class Comment {
@@ -92,4 +66,14 @@ class Comment {
     required this.content,
     required this.createdAt,
   });
+
+  factory Comment.fromJson(Map<String, dynamic> json) {
+    return Comment(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      userName: json['userName'] as String,
+      content: json['content'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
 }

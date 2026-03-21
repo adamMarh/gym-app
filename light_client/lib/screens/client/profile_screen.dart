@@ -3,6 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/class_provider.dart';
+import '../../providers/feed_provider.dart';
+import '../../providers/staff_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../providers/workout_provider.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../widgets/common/kinetic_button.dart';
@@ -66,11 +71,20 @@ class ProfileScreen extends StatelessWidget {
             label: 'SIGN OUT',
             isSecondary: true,
             fullWidth: true,
-            onPressed: () => context.read<AuthProvider>().logout(),
+            onPressed: () => _signOut(context),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    context.read<ClassProvider>().clear();
+    context.read<WorkoutProvider>().clear();
+    context.read<FeedProvider>().clear();
+    context.read<StaffProvider>().clear();
+    context.read<UserProvider>().clear();
+    await context.read<AuthProvider>().logout();
   }
 
   void _showEditSheet(BuildContext context, User user) {

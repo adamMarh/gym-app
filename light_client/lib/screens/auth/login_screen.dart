@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
@@ -25,22 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    // Demo login: pick user by email prefix
-    final email = _emailCtrl.text.trim().toLowerCase();
-    User user;
-    if (email.contains('admin') || email == 'sam@example.com') {
-      user = User.mockUsers.firstWhere((u) => u.role == UserRole.admin);
-    } else if (email.contains('staff') || email == 'jordan@example.com') {
-      user = User.mockUsers.firstWhere((u) => u.role == UserRole.staff);
-    } else {
-      user = User.mockUsers.firstWhere((u) => u.role == UserRole.client);
-    }
-    context.read<AuthProvider>().login(user);
+  Future<void> _login() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passCtrl.text;
+    if (email.isEmpty || password.isEmpty) return;
+    await context.read<AuthProvider>().login(email, password);
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -114,11 +108,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
+              // Error message
+              if (auth.error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  auth.error!.toUpperCase(),
+                  style: AppTextStyles.labelSmCaps.copyWith(color: AppColors.error),
+                ),
+              ],
+
               const SizedBox(height: 32),
 
               KineticButton(
-                label: 'SIGN IN',
-                onPressed: _login,
+                label: auth.isLoading ? 'SIGNING IN...' : 'SIGN IN',
+                onPressed: auth.isLoading ? null : _login,
                 fullWidth: true,
               ),
 
@@ -136,6 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     _DemoHint('Client', 'alex@example.com'),
                     _DemoHint('Staff', 'jordan@example.com'),
                     _DemoHint('Admin', 'sam@example.com'),
+                    const SizedBox(height: 4),
+                    Text('Password: password', style: AppTextStyles.labelMd),
                   ],
                 ),
               ),

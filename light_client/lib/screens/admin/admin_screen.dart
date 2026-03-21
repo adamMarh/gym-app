@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/user.dart';
 import '../../providers/class_provider.dart';
 import '../../providers/feed_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../widgets/client/class_card.dart';
@@ -54,20 +55,24 @@ class _UsersTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final users = User.mockUsers;
+    final userProvider = context.watch<UserProvider>();
+
+    if (userProvider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final users = userProvider.users;
+    final clients = users.where((u) => u.role == UserRole.client).length;
+    final staff = users.where((u) => u.role == UserRole.staff).length;
 
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        // Summary stats
         Row(
           children: [
             Expanded(
               child: PowerStatCard(
-                value: users
-                    .where((u) => u.role == UserRole.client)
-                    .length
-                    .toString(),
+                value: clients.toString(),
                 unit: '',
                 label: 'Clients',
                 accentColor: AppColors.primary,
@@ -76,10 +81,7 @@ class _UsersTab extends StatelessWidget {
             const SizedBox(width: 2),
             Expanded(
               child: PowerStatCard(
-                value: users
-                    .where((u) => u.role == UserRole.staff)
-                    .length
-                    .toString(),
+                value: staff.toString(),
                 unit: '',
                 label: 'Staff',
                 accentColor: AppColors.secondary,
@@ -88,10 +90,8 @@ class _UsersTab extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-
         Text('ALL MEMBERS', style: AppTextStyles.labelSmCaps),
         const SizedBox(height: 12),
-
         ...users.map((u) => _UserRow(user: u)),
       ],
     );
@@ -126,110 +126,26 @@ class _UserRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(user.name,
-                    style: AppTextStyles.labelLg
-                        .copyWith(color: AppColors.onBackground, fontWeight: FontWeight.w700)),
+                    style: AppTextStyles.labelLg.copyWith(
+                        color: AppColors.onBackground,
+                        fontWeight: FontWeight.w700)),
                 Text(user.email, style: AppTextStyles.labelMd),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.secondaryContainer,
-                ),
-                child: Text(
-                  user.role.name.toUpperCase(),
-                  style: AppTextStyles.labelSmCaps
-                      .copyWith(color: AppColors.onSecondaryContainer),
-                ),
-              ),
-              const SizedBox(height: 4),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined,
-                    size: 16, color: AppColors.primary),
-                onPressed: () => _showEditUser(context, user),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(100),
+              color: AppColors.secondaryContainer,
+            ),
+            child: Text(
+              user.role.name.toUpperCase(),
+              style: AppTextStyles.labelSmCaps
+                  .copyWith(color: AppColors.onSecondaryContainer),
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showEditUser(BuildContext context, User user) {
-    final nameCtrl = TextEditingController(text: user.name);
-    final emailCtrl = TextEditingController(text: user.email);
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.surfaceContainerLow,
-      isScrollControlled: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 20,
-          right: 20,
-          top: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('EDIT CLIENT', style: AppTextStyles.headlineSm),
-            const SizedBox(height: 20),
-            TextField(
-              controller: nameCtrl,
-              style: AppTextStyles.bodyLg
-                  .copyWith(color: AppColors.onBackground),
-              decoration: const InputDecoration(labelText: 'FULL NAME'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: emailCtrl,
-              style: AppTextStyles.bodyLg
-                  .copyWith(color: AppColors.onBackground),
-              decoration: const InputDecoration(labelText: 'EMAIL'),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryContainer],
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => Navigator.pop(ctx),
-                  child: const SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: Text(
-                          'SAVE CHANGES',
-                          style: TextStyle(
-                            color: AppColors.onPrimaryContainer,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
       ),
     );
   }
@@ -252,11 +168,10 @@ class _ClassesTab extends StatelessWidget {
           children: [
             Text('ALL CLASSES', style: AppTextStyles.labelSmCaps),
             GestureDetector(
-              onTap: () {},
+              onTap: () => _showAddClassSheet(context),
               child: Text(
                 '+ ADD CLASS',
-                style: AppTextStyles.labelSmCaps
-                    .copyWith(color: AppColors.primary),
+                style: AppTextStyles.labelSmCaps.copyWith(color: AppColors.primary),
               ),
             ),
           ],
@@ -275,6 +190,166 @@ class _ClassesTab extends StatelessWidget {
       ],
     );
   }
+
+  void _showAddClassSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceContainerLow,
+      isScrollControlled: true,
+      builder: (_) => const _AddClassSheet(),
+    );
+  }
+}
+
+class _AddClassSheet extends StatefulWidget {
+  const _AddClassSheet();
+
+  @override
+  State<_AddClassSheet> createState() => _AddClassSheetState();
+}
+
+class _AddClassSheetState extends State<_AddClassSheet> {
+  final _titleCtrl = TextEditingController();
+  final _instructorCtrl = TextEditingController();
+  final _categoryCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _capacityCtrl = TextEditingController(text: '20');
+  final _durationCtrl = TextEditingController(text: '60');
+  DateTime _startTime = DateTime.now().add(const Duration(hours: 1));
+
+  @override
+  void dispose() {
+    for (final c in [_titleCtrl, _instructorCtrl, _categoryCtrl,
+        _descCtrl, _capacityCtrl, _durationCtrl]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _save(BuildContext ctx) async {
+    if (_titleCtrl.text.trim().isEmpty ||
+        _instructorCtrl.text.trim().isEmpty ||
+        _categoryCtrl.text.trim().isEmpty) return;
+
+    await ctx.read<ClassProvider>().addClass(
+          _buildSession(),
+        );
+    if (ctx.mounted) Navigator.pop(ctx);
+  }
+
+  _buildSession() {
+    // Return a dummy ClassSession; ClassProvider.addClass() sends the fields
+    // to the API and replaces it with the server response.
+    return _DraftClass(
+      title: _titleCtrl.text.trim().toUpperCase(),
+      instructor: _instructorCtrl.text.trim(),
+      startTime: _startTime,
+      durationMinutes: int.tryParse(_durationCtrl.text) ?? 60,
+      capacity: int.tryParse(_capacityCtrl.text) ?? 20,
+      category: _categoryCtrl.text.trim().toUpperCase(),
+      description: _descCtrl.text.trim(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 20, right: 20, top: 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ADD CLASS', style: AppTextStyles.headlineSm),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _titleCtrl,
+              textCapitalization: TextCapitalization.characters,
+              style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+              decoration: const InputDecoration(labelText: 'TITLE'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _instructorCtrl,
+              style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+              decoration: const InputDecoration(labelText: 'INSTRUCTOR'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _categoryCtrl,
+              textCapitalization: TextCapitalization.characters,
+              style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+              decoration: const InputDecoration(labelText: 'CATEGORY (e.g. HIIT)'),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _capacityCtrl,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+                    decoration: const InputDecoration(labelText: 'CAPACITY'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _durationCtrl,
+                    keyboardType: TextInputType.number,
+                    style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+                    decoration: const InputDecoration(labelText: 'DURATION (min)'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _descCtrl,
+              style: AppTextStyles.bodyMd.copyWith(color: AppColors.onBackground),
+              decoration: const InputDecoration(labelText: 'DESCRIPTION (optional)'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: () => _save(context),
+              child: Text('CREATE CLASS',
+                  style: AppTextStyles.labelMd.copyWith(
+                      color: AppColors.onPrimary, fontWeight: FontWeight.w700)),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Lightweight data holder used by _AddClassSheet
+class _DraftClass {
+  final String title;
+  final String instructor;
+  final DateTime startTime;
+  final int durationMinutes;
+  final int capacity;
+  final String category;
+  final String description;
+
+  _DraftClass({
+    required this.title,
+    required this.instructor,
+    required this.startTime,
+    required this.durationMinutes,
+    required this.capacity,
+    required this.category,
+    required this.description,
+  });
 }
 
 // ─── Moderation Tab ───────────────────────────────────────────────────────────
@@ -306,7 +381,9 @@ class _ModerationTab extends StatelessWidget {
                 value: flagged.length.toString(),
                 unit: '',
                 label: 'Flagged',
-                accentColor: flagged.isNotEmpty ? AppColors.error : AppColors.secondary,
+                accentColor: flagged.isNotEmpty
+                    ? AppColors.error
+                    : AppColors.secondary,
               ),
             ),
           ],
@@ -314,8 +391,8 @@ class _ModerationTab extends StatelessWidget {
         const SizedBox(height: 24),
 
         if (flagged.isNotEmpty) ...[
-          Text('FLAGGED POSTS', style: AppTextStyles.labelSmCaps
-              .copyWith(color: AppColors.error)),
+          Text('FLAGGED POSTS',
+              style: AppTextStyles.labelSmCaps.copyWith(color: AppColors.error)),
           const SizedBox(height: 12),
           ...flagged.map(
             (post) => Padding(

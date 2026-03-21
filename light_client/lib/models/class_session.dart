@@ -26,6 +26,23 @@ class ClassSession {
   int get spotsLeft => capacity - enrolled;
   bool get isFull => spotsLeft <= 0;
 
+  factory ClassSession.fromJson(Map<String, dynamic> json) {
+    return ClassSession(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      instructor: json['instructor'] as String,
+      startTime: DateTime.parse(json['startTime'] as String),
+      duration: Duration(minutes: (json['durationMinutes'] as num).toInt()),
+      capacity: (json['capacity'] as num).toInt(),
+      enrolled: (json['enrolled'] as num).toInt(),
+      category: json['category'] as String,
+      description: (json['description'] as String?)?.isEmpty == true
+          ? null
+          : json['description'] as String?,
+      isBooked: json['isBooked'] as bool? ?? false,
+    );
+  }
+
   ClassSession copyWith({bool? isBooked, int? enrolled}) {
     return ClassSession(
       id: id,
@@ -40,71 +57,4 @@ class ClassSession {
       isBooked: isBooked ?? this.isBooked,
     );
   }
-
-  static List<ClassSession> mockClasses = [
-    ClassSession(
-      id: 'c1',
-      title: 'HIIT BLAST',
-      instructor: 'Marcus T.',
-      startTime: DateTime.now().add(const Duration(hours: 2)),
-      duration: const Duration(minutes: 45),
-      capacity: 20,
-      enrolled: 14,
-      category: 'HIIT',
-      description: 'High-intensity interval training to torch calories.',
-    ),
-    ClassSession(
-      id: 'c2',
-      title: 'POWER YOGA',
-      instructor: 'Priya M.',
-      startTime: DateTime.now().add(const Duration(hours: 5)),
-      duration: const Duration(minutes: 60),
-      capacity: 15,
-      enrolled: 15,
-      category: 'YOGA',
-      description: 'Strength-focused yoga flow for athletes.',
-    ),
-    ClassSession(
-      id: 'c3',
-      title: 'HEAVY LIFTING',
-      instructor: 'Bruno K.',
-      startTime: DateTime.now().add(const Duration(days: 1, hours: 7)),
-      duration: const Duration(hours: 1),
-      capacity: 12,
-      enrolled: 8,
-      category: 'STRENGTH',
-      description: 'Compound movements to build raw strength.',
-      isBooked: true,
-    ),
-    ClassSession(
-      id: 'c4',
-      title: 'SPIN CYCLE',
-      instructor: 'Zara L.',
-      startTime: DateTime.now().add(const Duration(days: 1, hours: 10)),
-      duration: const Duration(minutes: 50),
-      capacity: 25,
-      enrolled: 19,
-      category: 'CARDIO',
-    ),
-    ClassSession(
-      id: 'c5',
-      title: 'BOXING BASICS',
-      instructor: 'Dom R.',
-      startTime: DateTime.now().add(const Duration(days: 2, hours: 8)),
-      duration: const Duration(hours: 1),
-      capacity: 18,
-      enrolled: 10,
-      category: 'BOXING',
-    ),
-    ClassSession(
-      id: 'c6',
-      title: 'CORE & MORE',
-      instructor: 'Emma S.',
-      startTime: DateTime.now().add(const Duration(days: 2, hours: 12)),
-      duration: const Duration(minutes: 30),
-      capacity: 20,
-      enrolled: 5,
-      category: 'CORE',
-    ),
-  ];
 }
