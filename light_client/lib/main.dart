@@ -12,11 +12,11 @@ import 'navigation/main_navigation.dart';
 import 'screens/auth/login_screen.dart';
 
 void main() {
-  runApp(const CseeApp());
+  runApp(const GymApp());
 }
 
-class CseeApp extends StatelessWidget {
-  const CseeApp({super.key});
+class GymApp extends StatelessWidget {
+  const GymApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class CseeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
-        title: 'CSEE GYM',
+        title: 'Gym',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.dark,
         home: const _AppStartup(),

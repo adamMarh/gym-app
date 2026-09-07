@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { TokenPayload, UserRole } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'csee-gym-super-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'gym-gym-super-secret-key-2024';
 
 interface DecodedToken extends jwt.JwtPayload {
   userId: string;

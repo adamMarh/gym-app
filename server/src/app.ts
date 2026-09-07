@@ -47,7 +47,7 @@ async function bootstrap(): Promise<void> {
   try {
     await seedDatabase();
     app.listen(PORT, () => {
-      console.log(`\n🏋️  CSEE Backend running on http://localhost:${PORT}`);
+      console.log(`\n🏋️  Gym Backend running on http://localhost:${PORT}`);
       console.log(`📁  DB files in: backend/DB/`);
       console.log(`\nRoutes:`);
       console.log(`  POST   /api/auth/login`);

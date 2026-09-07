@@ -1,6 +1,6 @@
 {
-    "name": "csee",
-    "short_name": "csee",
+    "name": "gym",
+    "short_name": "gym",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

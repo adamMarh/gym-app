@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:csee_gym_app/models/user.dart';
-import 'package:csee_gym_app/models/workout.dart';
-import 'package:csee_gym_app/models/class_session.dart';
-import 'package:csee_gym_app/models/post.dart';
-import 'package:csee_gym_app/models/staff_report.dart';
+import 'package:gym_gym_app/models/user.dart';
+import 'package:gym_gym_app/models/workout.dart';
+import 'package:gym_gym_app/models/class_session.dart';
+import 'package:gym_gym_app/models/post.dart';
+import 'package:gym_gym_app/models/staff_report.dart';
 
 void main() {
   group('User model', () {

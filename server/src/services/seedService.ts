@@ -229,7 +229,7 @@ export async function seedDatabase(): Promise<void> {
         userId: 'u1',
         userName: 'Alex Rivera',
         userAvatarUrl: '',
-        content: 'NEW PR TODAY 🔥 Hit 150KG on the squat. Consistent training pays off. #CSEE #PRAlert',
+        content: 'NEW PR TODAY 🔥 Hit 150KG on the squat. Consistent training pays off. #Gym #PRAlert',
         imageUrl: '',
         createdAt: addHours(now, -2).toISOString(),
         likes: 42,

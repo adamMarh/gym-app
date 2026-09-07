@@ -1,4 +1,4 @@
-# CSEE — Gym Performance Engine
+# Gym
 
 A full-stack gym management app built with **Flutter** (frontend) and **Node.js + TypeScript** (backend). Supports three user roles — client, staff, and admin — each with their own set of features.
 
@@ -59,7 +59,7 @@ A full-stack gym management app built with **Flutter** (frontend) and **Node.js 
 ## Project Structure
 
 ```
-CSEE/
+Gym/
 ├── light_client/          # Flutter frontend
 │   ├── lib/
 │   │   ├── main.dart
@@ -116,7 +116,7 @@ CSEE/
 ### Backend Setup
 
 ```bash
-cd CSEE/server
+cd Gym/server
 npm install
 npm start
 ```
@@ -130,7 +130,7 @@ On first boot it automatically creates the `DB/` folder and seeds all CSV files 
 ✔ Seeded class_sessions.csv
 ✔ Seeded workout_sessions.csv
 ...
-🏋️  CSEE Backend running on http://localhost:3000
+🏋️  Gym Backend running on http://localhost:3000
 ```
 
 **Other scripts:**
@@ -146,7 +146,7 @@ npm run start:prod   # Run compiled JS (after build)
 ### Flutter Setup
 
 ```bash
-cd CSEE/light_client
+cd Gym/light_client
 flutter pub get
 flutter run
 ```

@@ -43,8 +43,8 @@ class AuthProvider extends ChangeNotifier {
       _currentUser = User.fromJson(data['user'] as Map<String, dynamic>);
     } on ApiException catch (e) {
       _error = e.message;
-    } catch (_) {
-      _error = 'Could not connect to server.';
+    } catch (e) {
+      _error = e.toString().replaceFirst('ApiException(0): ', '');
     } finally {
       _isLoading = false;
       notifyListeners();

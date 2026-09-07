@@ -1,7 +1,7 @@
 {
-  "name": "csee-backend",
+  "name": "gym-backend",
   "version": "1.0.0",
-  "description": "CSEE Gym App Backend API",
+  "description": "Gym Backend API",
   "main": "dist/app.js",
   "scripts": {
     "start": "./node_modules/.bin/ts-node src/app.ts",

@@ -57,9 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('CSEE', style: AppTextStyles.displaySm),
+                      Text('Gym', style: AppTextStyles.displaySm),
                       Text(
-                        'GYM PERFORMANCE ENGINE',
+                        'Gym Performance Engine',
                         style: AppTextStyles.labelSmCaps,
                       ),
                     ],
@@ -111,9 +111,24 @@ class _LoginScreenState extends State<LoginScreen> {
               // Error message
               if (auth.error != null) ...[
                 const SizedBox(height: 12),
-                Text(
-                  auth.error!.toUpperCase(),
-                  style: AppTextStyles.labelSmCaps.copyWith(color: AppColors.error),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          color: AppColors.error, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          auth.error!,
+                          style: AppTextStyles.labelMd
+                              .copyWith(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
 
